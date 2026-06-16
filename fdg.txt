@@ -1,1 +1,25 @@
-fdg
+#using model
+
+export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test/data_preprocessing/nnNet_preprocessed
+export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test/data_preprocessing/nnUNet_raw_data_base
+export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test/results_test/nnUNet_trained_models
+
+ nnUNetv2_predict_from_modelfolder \
+  -i infer_in \
+  -o infer_out \
+  -m /mnt/c/Users/sw1570304/Documents/monai_test/results_test/nnUNet_trained_models/Dataset001_monai_nnunet_tr/nnUNetTrainer_2000epochs__nnUNetPlans__3d_fullres \
+  -f 0 \
+  -chk checkpoint_final.pth
+
+  #dice score
+
+  #Change names to be consistent with the color table
+segment_names_to_labels = [(name.replace("_", " "), label) for name, label in segment_names_to_labels] #remove '_'
+
+segmentationNode = slicer.util.getNode("1928") #Change it to your segment name
+segmentation = segmentationNode.GetSegmentation()
+
+for i, item in enumerate(segment_names_to_labels):
+    segment = segmentation.GetNthSegment(i)
+    segment.SetName(item[0])
+    print(item)
