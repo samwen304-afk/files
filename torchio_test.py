@@ -5,11 +5,11 @@ import torchio as tio
 import os
 
 
-volRoot = '/mnt/c/Users/sw1570304/Documents/image_aug/images/'
-maskRoot = '/mnt/c/Users/sw1570304/Documents/image_aug/labels/'
+volRoot = '/mnt/c/Users/sw1570304/Documents/image_aug3/images/'
+maskRoot = '/mnt/c/Users/sw1570304/Documents/image_aug3/labels/'
 
-volOutRoot = '/mnt/c/Users/sw1570304/Documents/image_aug/labels_aug/'
-maskOutRoot = '/mnt/c/Users/sw1570304/Documents/image_aug/images_aug/'
+volOutRoot = '/mnt/c/Users/sw1570304/Documents/image_aug3/labels_aug/'
+maskOutRoot = '/mnt/c/Users/sw1570304/Documents/image_aug3/images_aug/'
 # "C:\Users\sw1570304\Documents\image_aug"
 
 imageFiles = sorted(os.listdir(volRoot))
