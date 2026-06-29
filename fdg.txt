@@ -23,3 +23,31 @@ for i, item in enumerate(segment_names_to_labels):
     segment = segmentation.GetNthSegment(i)
     segment.SetName(item[0])
     print(item)
+
+
+compose_transform = tio.Compose([
+    tio.RescaleIntensity(out_min_max=(0, 1)),
+    tio.RandomFlip(axes=['inferior-superior'], flip_probability=0.5),
+    tio.OneOf({
+        tio.RandomAffine(): 0.5,
+        tio.RandomElasticDeformation(): 0.5,
+    },p=0.8),
+    tio.RandomAnisotropy(p =0.25),
+])
+
+compose_transform = tio.Compose([
+    tio.RescaleIntensity(out_min_max=(0, 1)),
+    tio.RandomFlip(axes=['inferior-superior'], flip_probability=0.5),
+    tio.RandomElasticDeformation(num_control_points=(7, 7, 7), locked_borders=2, p = 1.0)
+    tio.RandomAnisotropy(p =0.25),
+])
+
+
+
+
+compose_transform = tio.Compose([
+    tio.RescaleIntensity(out_min_max=(0, 1)),
+    tio.RandomFlip(axes=['inferior-superior'], flip_probability=0.5),
+    tio.RandomAffine(scales=(0.9, 1.2), p = 1.0)
+    tio.RandomAnisotropy(p =0.25),
+])
