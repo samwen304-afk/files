@@ -1,5 +1,3 @@
-#/home/zhang/Documents/orbital_seg/imageAug/torchio_test.py
-
 import torch
 import torchio as tio
 import os
@@ -7,15 +5,15 @@ import os
 # -------------------------
 # Input folders
 # -------------------------
-volRoot = '/mnt/c/Users/sw1570304/Documents/6.30/images/'
-maskRoot = '/mnt/c/Users/sw1570304/Documents/6.30/labels/'
+volRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/images/'
+maskRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/labels/'
 
 # -------------------------
 # Output folders
 # IMPORTANT: images go to images_aug, labels go to labels_aug
 # -------------------------
-volOutRoot = '/mnt/c/Users/sw1570304/Documents/6.30/images_aug/'
-maskOutRoot = '/mnt/c/Users/sw1570304/Documents/6.30/labels_aug/'
+volOutRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/images_aug/'
+maskOutRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/labels_aug/'
 
 os.makedirs(volOutRoot, exist_ok=True)
 os.makedirs(maskOutRoot, exist_ok=True)
@@ -29,7 +27,7 @@ print("Label files:")
 print(labelFiles)
 
 # Number of augmented copies per image/label pair
-iter = 5
+n_aug = 5
 
 # -------------------------
 # Augmentation transform
@@ -42,9 +40,10 @@ compose_transform = tio.Compose([
         flip_probability=0.5
     ),
 
-    tio.RandomElasticDeformation(
-        num_control_points=(7, 7, 7),
-        locked_borders=2,
+    tio.RandomAffine(
+        scales=(0.9, 1.2),
+        image_interpolation='linear',
+        label_interpolation='nearest',
         p=1.0
     ),
 
@@ -56,7 +55,7 @@ compose_transform = tio.Compose([
 # -------------------------
 # Run augmentation
 # -------------------------
-for j in range(iter):
+for j in range(n_aug):
 
     print(f"\nStarting augmentation round {j}")
 
