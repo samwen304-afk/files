@@ -30,12 +30,12 @@ for j in range(iter):
             label=tio.LabelMap(labelFilePath),
         )
 
-    compose_transform = tio.Compose([
-        tio.RescaleIntensity(out_min_max=(0, 1)),
-        tio.RandomFlip(axes=['inferior-superior'], flip_probability=0.5),
-        tio.RandomElasticDeformation(num_control_points=(7, 7, 7), locked_borders=2, p = 1.0),
-        tio.RandomAnisotropy(p =0.25),
-])
+        compose_transform = tio.Compose([
+            tio.RescaleIntensity(out_min_max=(0, 1)),
+            tio.RandomFlip(axes=['inferior-superior'], flip_probability=0.5),
+            tio.RandomElasticDeformation(num_control_points=(7, 7, 7), locked_borders=2, p = 1.0),
+            tio.RandomAnisotropy(p =0.25),
+        ])
 
         #Add random Affine Zoom later?
 
