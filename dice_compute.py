@@ -1,6 +1,6 @@
-segA = slicer.util.getNode("1807")
-segB = slicer.util.getNode("predicted.1807.nii.gz")
-outCsvPath = "C:/Users/sw1570304/Documents/1807_dice_results.csv"   # change as you like
+segA = slicer.util.getNode("2022.nii.gz_1")
+segB = slicer.util.getNode("2022.nii.gz")
+outCsvPath = "C:/Users/sw1570304/Documents/2022m1_dice_results.csv"   # change as you like
 
 # -------------------------
 # Helpers
