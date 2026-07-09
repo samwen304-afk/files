@@ -1,0 +1,212 @@
+import vtk
+import numpy as np
+
+# -------------------------
+# User settings
+# -------------------------
+segA = slicer.util.getNode("2031.nii.gz_1")   # reference / ground truth
+segB = slicer.util.getNode("2031.nii.gz")     # compare / prediction
+
+outCsvPath = "C:/Users/sw1570304/Documents/2031m1_dice_hausdorff_results.csv"
+
+
+# -------------------------
+# Helpers
+# -------------------------
+def segmentNameToIdMap(segNode):
+    seg = segNode.GetSegmentation()
+    d = {}
+    for i in range(seg.GetNumberOfSegments()):
+        sid = seg.GetNthSegmentID(i)
+        d[seg.GetSegment(sid).GetName()] = sid
+    return d
+
+
+def getFirstAvailableMetric(obj, methodNames):
+    """
+    Try several possible getter method names.
+    Returns np.nan if none are found.
+    """
+    for methodName in methodNames:
+        if hasattr(obj, methodName):
+            try:
+                return float(getattr(obj, methodName)())
+            except Exception:
+                pass
+    return np.nan
+
+
+# -------------------------
+# Check SegmentComparison module
+# -------------------------
+if not hasattr(slicer.modules, "segmentcomparison"):
+    raise RuntimeError(
+        "SegmentComparison module not found. Install the SlicerRT extension and restart Slicer."
+    )
+
+logic = slicer.modules.segmentcomparison.logic()
+
+paramNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLSegmentComparisonNode")
+paramNode.SetAndObserveReferenceSegmentationNode(segA)
+paramNode.SetAndObserveCompareSegmentationNode(segB)
+
+
+# -------------------------
+# Match segments by name
+# -------------------------
+mapA = segmentNameToIdMap(segA)
+mapB = segmentNameToIdMap(segB)
+
+commonNames = sorted(set(mapA) & set(mapB))
+onlyA = sorted(set(mapA) - set(mapB))
+onlyB = sorted(set(mapB) - set(mapA))
+
+print(f"Matched segments: {len(commonNames)}")
+
+if onlyA:
+    print("Only in A:", onlyA)
+
+if onlyB:
+    print("Only in B:", onlyB)
+
+print()
+
+
+# -------------------------
+# Create output table
+# -------------------------
+tableNode = slicer.mrmlScene.AddNewNodeByClass(
+    "vtkMRMLTableNode",
+    "Dice_Hausdorff_Results"
+)
+
+table = tableNode.GetTable()
+table.Initialize()
+
+colName = vtk.vtkStringArray()
+colName.SetName("Segment")
+table.AddColumn(colName)
+
+colDice = vtk.vtkDoubleArray()
+colDice.SetName("Dice")
+table.AddColumn(colDice)
+
+colHD = vtk.vtkDoubleArray()
+colHD.SetName("Hausdorff_mm")
+table.AddColumn(colHD)
+
+colHD95 = vtk.vtkDoubleArray()
+colHD95.SetName("HD95_mm")
+table.AddColumn(colHD95)
+
+colAvgHD = vtk.vtkDoubleArray()
+colAvgHD.SetName("AverageHausdorff_mm")
+table.AddColumn(colAvgHD)
+
+
+# -------------------------
+# Compute Dice + Hausdorff
+# -------------------------
+diceValues = []
+hdValues = []
+hd95Values = []
+avgHdValues = []
+
+for name in commonNames:
+    sidA = mapA[name]
+    sidB = mapB[name]
+
+    paramNode.SetReferenceSegmentID(sidA)
+    paramNode.SetCompareSegmentID(sidB)
+
+    # Dice
+    logic.ComputeDiceStatistics(paramNode)
+    dice = float(paramNode.GetDiceCoefficient())
+
+    # Hausdorff
+    logic.ComputeHausdorffDistances(paramNode)
+
+    hd = getFirstAvailableMetric(
+        paramNode,
+        [
+            "GetMaximumHausdorffDistanceForVolumeMm",
+            "GetHausdorffDistanceForVolumeMm",
+            "GetMaximumHausdorffDistanceMm",
+            "GetHausdorffDistanceMm"
+        ]
+    )
+
+    hd95 = getFirstAvailableMetric(
+        paramNode,
+        [
+            "GetPercent95HausdorffDistanceForVolumeMm",
+            "GetPercent95HausdorffDistanceMm",
+            "GetHausdorffDistance95PercentileMm",
+            "GetHausdorffDistancePercent95Mm"
+        ]
+    )
+
+    avgHd = getFirstAvailableMetric(
+        paramNode,
+        [
+            "GetAverageHausdorffDistanceForVolumeMm",
+            "GetAverageHausdorffDistanceMm",
+            "GetMeanHausdorffDistanceMm"
+        ]
+    )
+
+    diceValues.append(dice)
+
+    if np.isfinite(hd):
+        hdValues.append(hd)
+
+    if np.isfinite(hd95):
+        hd95Values.append(hd95)
+
+    if np.isfinite(avgHd):
+        avgHdValues.append(avgHd)
+
+    row = table.InsertNextBlankRow()
+    table.SetValue(row, 0, name)
+    table.SetValue(row, 1, dice)
+    table.SetValue(row, 2, hd)
+    table.SetValue(row, 3, hd95)
+    table.SetValue(row, 4, avgHd)
+
+    print(
+        f"{name:35s} "
+        f"Dice={dice:.6f} | "
+        f"HD={hd:.3f} mm | "
+        f"HD95={hd95:.3f} mm | "
+        f"AvgHD={avgHd:.3f} mm"
+    )
+
+
+# -------------------------
+# Summary
+# -------------------------
+print()
+print("Summary")
+print("-------")
+
+if len(diceValues) > 0:
+    print(f"Mean Dice: {np.mean(diceValues):.6f}")
+
+if len(hdValues) > 0:
+    print(f"Mean Hausdorff: {np.mean(hdValues):.3f} mm")
+
+if len(hd95Values) > 0:
+    print(f"Mean HD95: {np.mean(hd95Values):.3f} mm")
+
+if len(avgHdValues) > 0:
+    print(f"Mean Average Hausdorff: {np.mean(avgHdValues):.3f} mm")
+
+
+# -------------------------
+# Export to CSV
+# -------------------------
+slicer.util.saveNode(tableNode, outCsvPath)
+
+print()
+print("Saved CSV to:", outCsvPath)
+print("Done. Results table:", tableNode.GetName())
