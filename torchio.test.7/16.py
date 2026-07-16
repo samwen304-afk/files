@@ -5,15 +5,15 @@ import os
 # -------------------------
 # Input folders
 # -------------------------
-volRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/images/'
-maskRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/labels/'
+volRoot = '/mnt/c/Users/sw1570304/Documents/image_aug4/images/'
+maskRoot = '/mnt/c/Users/sw1570304/Documents/image_aug4/labels/'
 
 # -------------------------
 # Output folders
 # IMPORTANT: images go to images_aug, labels go to labels_aug
 # -------------------------
-volOutRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/images_aug/'
-maskOutRoot = '/mnt/c/Users/sw1570304/Documents/6.30.2/labels_aug/'
+volOutRoot = '/mnt/c/Users/sw1570304/Documents/image_aug4/images_aug/'
+maskOutRoot = '/mnt/c/Users/sw1570304/Documents/image_aug4/labels_aug/'
 
 os.makedirs(volOutRoot, exist_ok=True)
 os.makedirs(maskOutRoot, exist_ok=True)
@@ -34,22 +34,12 @@ n_aug = 5
 # -------------------------
 compose_transform = tio.Compose([
     tio.RescaleIntensity(out_min_max=(0, 1)),
-
-    tio.RandomFlip(
-        axes=['inferior-superior'],
-        flip_probability=0.5
-    ),
-
-    tio.RandomAffine(
-        scales=(0.9, 1.2),
-        image_interpolation='linear',
-        label_interpolation='nearest',
-        p=1.0
-    ),
-
-    tio.RandomAnisotropy(
-        p=0.25
-    ),
+    tio.RandomFlip(axes=['inferior-superior'], flip_probability=0.5),
+    tio.OneOf({
+        tio.RandomAffine(): 0.5,
+        tio.RandomElasticDeformation(): 0.5,
+    },p=0.8),
+    tio.RandomAnisotropy(p =0.25),
 ])
 
 # -------------------------
