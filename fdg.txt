@@ -26,14 +26,14 @@ export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test2/results_test2/nnU
 
 #model3
 
-export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test3/data_preprocessing/nnNet_preprocessed
-export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test3/data_preprocessing/nnUNet_raw_data_base
-export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/monai_test3/results_test716/nnUNet_trained_models
+export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/model_training/monai_test3/data_preprocessing/nnNet_preprocessed
+export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/model_training/monai_test3/data_preprocessing/nnUNet_raw_data_base
+export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/model_training/monai_test3/results_test716/nnUNet_trained_models
 
  nnUNetv2_predict_from_modelfolder \
   -i infer_in \
   -o infer_out \
-  -m /mnt/c/Users/sw1570304/Documents/monai_test3/results_test716/nnUNet_trained_models/Dataset001_monai_nnunet_tr/nnUNetTrainer_2000epochs__nnUNetPlans__3d_fullres \
+  -m /mnt/c/Users/sw1570304/Documents/model_training/monai_test3/results_test716/nnUNet_trained_models/Dataset001_monai_nnunet_tr/nnUNetTrainer_2000epochs__nnUNetPlans__3d_fullres \
   -f 0 \
   -chk checkpoint_final.pth
 
