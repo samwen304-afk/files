@@ -42,7 +42,7 @@ export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/model_training/monai_test3/re
   #Change names to be consistent with the color table
 segment_names_to_labels = [(name.replace("_", " "), label) for name, label in segment_names_to_labels] #remove '_'
 
-segmentationNode = slicer.util.getNode("2031.nii.gz_1") #Change it to your segment name
+segmentationNode = slicer.util.getNode("2031.nii.gz") #Change it to your segment name
 segmentation = segmentationNode.GetSegmentation()
 
 for i, item in enumerate(segment_names_to_labels):
