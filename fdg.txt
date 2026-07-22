@@ -42,7 +42,7 @@ export nnUNet_raw=/mnt/c/Users/sw1570304/Documents/model_training/monai_test3/re
   #Change names to be consistent with the color table
 segment_names_to_labels = [(name.replace("_", " "), label) for name, label in segment_names_to_labels] #remove '_'
 
-segmentationNode = slicer.util.getNode("2031.nii.gz") #Change it to your segment name
+segmentationNode = slicer.util.getNode("1048.nii.gz") #Change it to your segment name
 segmentation = segmentationNode.GetSegmentation()
 
 for i, item in enumerate(segment_names_to_labels):
@@ -78,3 +78,16 @@ compose_transform = tio.Compose([
     tio.RandomAffine(scales=(0.9, 1.2), p = 1.0)
     tio.RandomAnisotropy(p =0.25),
 ])
+
+
+
+
+#label map
+#export segmentation into labelmap with color codes
+segmentationNode = getNode('601_totalSeg_corrected Copy')  # Change source segmentation node that will be exported to a labelmap node
+labelmapVolumeNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLLabelMapVolumeNode")
+referenceVolumeNode = slicer.util.getNode('601:Isotropic') # set the volume node
+segmentIds = segmentationNode.GetSegmentation().GetSegmentIDs()  # export all segments
+colorTableNode = slicer.util.getNode('color')  # Change to the import colortable node name
+
+slicer.modules.segmentations.logic().ExportSegmentsToLabelmapNode(segmentationNode, segmentIds, labelmapVolumeNode, referenceVolumeNode, slicer.vtkSegmentation.EXTENT_REFERENCE_GEOMETRY, colorTableNode)
