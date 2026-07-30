@@ -4,10 +4,10 @@ import numpy as np
 # -------------------------
 # User settings
 # -------------------------
-segA = slicer.util.getNode("2031.nii.gz_1")   # reference / ground truth
-segB = slicer.util.getNode("2031.nii.gz")     # compare / prediction
+segA = slicer.util.getNode("1048.nii.gz")   # reference / ground truth
+segB = slicer.util.getNode("1.1048.nii.gz")     # compare / prediction
 
-outCsvPath = "C:/Users/sw1570304/Documents/2031m1_dice_hausdorff_results.csv"
+outCsvPath = "C:/Users/sw1570304/Documents/7.30.modelrun/hd.dice/1048m1_dice_hausdorff_results.csv"
 
 
 # -------------------------
